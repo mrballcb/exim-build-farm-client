@@ -1,0 +1,222 @@
+
+# -*-perl-*- hey - emacs - this is a perl file
+
+=comment
+
+Copyright (c) 2003-2010, Andrew Dunstan
+
+See accompanying License file for license details
+
+=cut 
+
+package EximBuild;
+
+use strict;
+
+use vars qw(%conf);
+
+# use vars qw($VERSION); $VERSION = 'REL_0.1';
+
+my $branch;
+{
+    no warnings qw(once);
+    $branch = $main::branch;
+}
+
+# This template assumes that the user running the buildfarm process is "farm"
+%conf =(
+    scm => 'git',
+    scmrepo => 'git://git.exim.org/exim.git', # default is community repo for either type
+    # Wishlist for future, track and build from multiple repos.
+    # Doesn't do anything yet.
+    repos => {
+      'exim' => 'git://www.mrball.net/exim/exim.git',
+      'exim.jgh' => 'git://www.mrball.net/exim/exim-jgh.git',
+      'exim.pdp' => 'git://www.mrball.net/exim/exim-pdp.git',
+      'exim.tlyons' => 'git://www.mrball.net/exim/exim-tlyons.git',
+    },
+    # webref for diffs on server - use default for community
+    scm_url => undef,
+    # for --reference on git repo
+    # git_reference => undef,
+    # or gmake if required. can include path if necessary.
+    make => 'make',
+    # >1 for parallel "make" and "make check" steps
+    make_jobs => undef,
+    # default is "tar -z -cf runlogs.tgz *.log"
+    # replacement must have the same effect
+    # must be absolute, can be either Unix or Windows style for MSVC
+    tar_log_cmd => undef,
+    # this directory must exist before anything will work
+    build_root => '/home/farm/buildfarm',
+    # set true to do vpath builds
+    use_vpath => undef,
+
+    keep_error_builds => 0,
+    # Linux style, use "*.core" for BSD
+    core_file_glob => "core*",
+
+    # build process will connect to this URL to upload results
+    target => "http://eximbuild.mrball.net/cgi-bin/eximstatus.pl",
+    # update_personality uses this when you want to update your
+    # machine's info (OS, version, compiler, version)
+    upgrade_target => "http://eximbuild.mrball.net/cgi-bin/upgrade.pl",
+
+    # Your host alias and password in the BuildFarm
+    animal => "alias_assigned_by_build_team",
+    secret => "secret_assigned_by_build_team",
+
+    # if force_every is a scalar it will be used on all branches, like this
+    # for legacy reasons:
+    # force_every => 336 , # max hours between builds, undef or 0 = unforced
+    # we now prefer it to be a hash with branch names as the keys, like this
+    #
+    # this setting should be kept conservatively high, or not used at all  -
+    # for the most part it's best to let the script decide if something
+    # has changed that requires a new run for the branch.
+    #
+    # an entry with a name of 'default' matches any branch not named
+    force_every => {
+        HEAD => 24*7,
+        # default => 168,
+    },
+
+    # alerts are triggered if the server doesn't see a build on a branch after
+    # this many hours, and then sent out every so often,
+    alerts => {
+        #HEAD          => { alert_after => 72,  alert_every => 24 },
+    },
+
+    print_success => undef,
+
+    # include / exclude pattern for files whose trigger a build
+    # if both are specified then they are both applied as filters
+    # undef means don't ignore anything.
+    # exclude qr[/(doc|po)/] to ignore changes to docs and po files (recommended)
+    # undef means null filter.
+    trigger_exclude => qr[/(doc|po)/],
+    trigger_include => undef,
+
+    # settings for mail notices - default to notifying nobody
+    # these lists contain addresses to be notified
+    # must be complete email addresses, as the email is sent from the server
+    mail_events =>{
+        all => [], # unconditional
+        fail => [], # if this build fails
+        change => [], # if this build causes a state change
+        green => [], # if this build causes a state change to/from OK
+    },
+
+    # env settings to apply within build/report process
+    # these settings will be seen by all the processes, including the
+    # configure process.
+    build_env =>{
+        # use a dedicated cache for the build farm. this should give us
+        # very high hit rates and slightly faster cache searching.
+        CCACHE_DIR => "/home/farm/buildfarm/ccache/$branch",
+
+        ### set this if you need a proxy setting for the
+        # outbound web transaction that reports the results
+        # BF_PROXY => 'http://my.proxy.server:portnum/',
+    },
+
+    # Environment settings on the make commandline.
+    # These cause full compile output and don't strip the binary.
+    make_args => q/FULLECHO='' STRIP_COMMAND=''/,
+
+    # Settings to add to Local/Makefile. These will set or override
+    # previous definitions of variables.  Example:
+    # LDFLAGS => '-Wall' will create LDFLAGS = '-Wall'
+    makefile_set =>{
+        # comment out if not using ccache
+        CC => 'ccache gcc',
+        # Other examples. Could use regex in config_features instead.
+        #SUPPORT_TLS => 'yes',
+        #TLS_LIBS => '-lssl -lcrypto',
+    },
+    # Settings to add to Local/Makefile. These will add to variables that
+    # are already defined earlier in the Makefile.  Example:
+    # LDFLAGS => '-Wall'  will create  LDFLAGS+='-Wall'
+    makefile_add =>{
+        # Show all warnings and errors
+        CFLAGS => '-Wall -Werror=format-security',
+        # Or enable debugging flags
+        #CFLAGS => '-g -Wall',
+        #LFLAGS => '-g',
+    },
+
+    # Another way to enable things in the Local/Makefile.
+    # Use a simple regex to change a default to what you want.
+    config_features=>[
+        q(s/^# EXPERIMENTAL_PRDR.*/EXPERIMENTAL_PRDR=yes/),
+    ],
+
+    # The user compiled as the master exim username.
+    # Requirement: The buildfarm user that runs the build farm script *MUST* have
+    # the group of the exim user as a secondary group. Example:
+    # user=>farm, group=>farm, secondary_groups=>exim
+    # user=>exim, group=>exim
+    master_exim_user => "exim",
+
+    # Range of tests to run if enable make_test in optional steps.
+    #range_num_tests => '1 999',
+    range_num_tests => '1 999',
+    # Hardcode some valid version for use during make test
+    exim_test_version => '4.80',
+
+    optional_steps =>{
+        # which optional steps to run and when to run them
+        # build_docs => {min_hours_since => 24*7},
+        make_test  => {min_hours_since => 24*7},
+    },
+
+    # locales to test
+    locales => [qw( C )],
+
+    # Unused
+    config_opts =>[
+        qw()
+    ],
+
+    # per-branch contents of extra config for check stages.
+    # each branch has an array of setting lines (no \n required)
+    # a DEFAULT entry is used for all branches, before any
+    # branch-specific settings.
+    extra_config =>{
+        DEFAULT => [
+            #q(log_line_prefix = '[%c:%l] '),
+            #"log_connections = 'true'",
+            #"log_disconnections = 'true'",
+            #"log_statement = 'all'",
+            #"fsync = off"
+        ],
+    },
+
+    # Unused
+    # port number actually used will be based on this param and the branch,
+    # so we ensure they don't collide
+    base_port => 5678,
+
+    # Unused
+    modules => [qw(TestUpgrade)],
+
+);
+
+if ($branch eq 'global')
+{
+
+    $conf{branches_to_build} = 'ALL';
+
+    # or 'HEAD_PLUS_LATEST' or 'HEAD_PLUS_LATEST2'
+    # or [qw( HEAD RELx_y_STABLE etc )]
+
+}
+
+##################################
+#
+# Can use perl below for
+# per branch processing.
+#
+##################################
+
+1;

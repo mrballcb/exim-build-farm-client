@@ -1,0 +1,5 @@
+This is based off the code to run a client member of the PostgreSQL Build Farm,
+adapted to run a client member of the Exim BuildFarm.
+
+See License.PG file for original License and Copyright details.
+
