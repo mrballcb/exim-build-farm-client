@@ -23,7 +23,7 @@ BEGIN
     @option_list =qw(
       $forcerun $buildconf $keepall $help
       $quiet $from_source $from_source_clean $testmode
-      $skip_steps $only_steps
+      $skip_steps $only_steps $override
       $nosend $nostatus $verbose
     );
 }
@@ -41,7 +41,7 @@ use vars qw($VERSION); $VERSION = 'REL_0.1';
 our (
     $forcerun, $buildconf, $keepall,$help,
     $quiet, $from_source,$from_source_clean, $testmode,
-    $skip_steps,$only_steps,
+    $skip_steps,$only_steps, $overrides,
     $nosend, $nostatus, $verbose,
 );
 
@@ -61,6 +61,7 @@ my (%standard_options);
     'quiet' => \$quiet,
     'skip-steps=s' => \$skip_steps,
     'only-steps=s' => \$only_steps,
+    'override=s@' => \$overrides,
 );
 
 $buildconf = "build-farm.conf"; # default value

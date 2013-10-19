@@ -178,6 +178,17 @@ my  $scm_timeout_secs = $EximBuild::conf{scm_timeout_secs}
 print scalar(localtime()),": buildfarm run for $animal:$branch starting\n"
   if $verbose;
 
+# Allow commandline overrides of conf variables
+foreach my $arg ( @{$EximBuild::Options::overrides} )
+{
+  if (my ($key,$val) = split '=', $arg)
+  {
+    $EximBuild::conf{$key} = $val;
+    printf "Commandline override: '$key' = '%s'\n", $EximBuild::conf{$key}
+      if $verbose;
+  }
+}
+
 if (ref($force_every) eq 'HASH')
 {
     $force_every = $force_every->{$branch} || $force_every->{default};
@@ -793,6 +804,7 @@ sub writelog
 
 sub display_features
 {
+    return unless step_wanted('features');
     my @out = `cd $exim
                src/build-*/exim -C test/confs/0000 -bV `;
     my $status = $? >>8;
