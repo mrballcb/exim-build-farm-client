@@ -10,7 +10,7 @@ fi
 cd $BFDIR
 # Update the build client if new version available
 if which git >/dev/null; then
-  git pull
+  git pull >/dev/null
 fi
 
 ./run_branches.pl $@
