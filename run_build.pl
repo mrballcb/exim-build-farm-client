@@ -126,7 +126,7 @@ if ($skip_steps =~ /\S/)
 $only_steps ||= "";
 if ($only_steps =~ /\S/)
 {
-    %only_steps = map {$_ => 1} split(/\s+/,$only_steps);
+    %only_steps = map {$_ => 1} split(/(\s+|[:,])/,$only_steps);
 }
 
 # Currently only specifying a branch is actually used.
@@ -692,6 +692,7 @@ usage: $0 [options] [branch]
   --test                    = short for --nosend --nostatus --verbose --force
   --skip-steps=list         = skip certain steps
   --only-steps=list         = only do certain steps, not allowed with skip-steps
+                              lists can be comma, colon, or space separated
 
 Default branch is HEAD. Usually only the --config option should be necessary.
 
@@ -1057,6 +1058,8 @@ sub make_ecpg_check
 
 sub configure
 {
+    return unless step_wanted('configure');
+    print time_str(),"creating configuration ...\n" if $verbose;
 
     my @quoted_opts;
     foreach my $c_opt (@$config_opts)
