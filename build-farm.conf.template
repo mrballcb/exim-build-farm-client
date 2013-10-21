@@ -27,7 +27,7 @@ my $branch;
 %conf =(
     scm => 'git',
     # default is github mirror of Exim
-    scmrepo => 'https://github.com/mrballcb/exim.git',
+    scmrepo => 'https://github.com/Exim/exim.git',
     # Wishlist for future, track and build from multiple repos.
     # Doesn't do anything yet.
     repos => {
