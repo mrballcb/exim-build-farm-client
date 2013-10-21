@@ -1,3 +1,4 @@
 build-farm.conf
+build-farm_*.conf
 tags
 run_web_txn.pl

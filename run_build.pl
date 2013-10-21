@@ -1387,6 +1387,7 @@ sub get_script_config_dump
         orig_env => $orig_env,
     };
     delete $conf->{secret};
+    $Data::Dumper::Sortkeys = 1;
     return  Data::Dumper->Dump([$conf],['Script_Config']);
 }
 
