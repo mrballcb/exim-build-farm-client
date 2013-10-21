@@ -1073,7 +1073,7 @@ sub configure
 
     my $env = $EximBuild::conf{makefile_set};
     my $add = $EximBuild::conf{makefile_add};
-    my $features = $EximBuild::conf{config_features};
+    my $features = $EximBuild::conf{makefile_regex};
 
     my $envstr = "";
     while (my ($key,$val) = each %$env)
@@ -1130,11 +1130,11 @@ sub configure
         push @confout, @tmp;
         @tmp = `cd $exim && perl -pi -e 's/^EXIM_MONITOR=(.*)/# EXIM_MONITOR=\$1/' $local_conf`;
         push @confout, @tmp;
-        for my $feature ( @$features )
+        for my $regex ( @$features )
         {
             @tmp = `cd $exim
-                    perl -pi -e '$feature' $local_conf 2>&1
-                    echo "Changed feature: $feature" `;
+                    perl -pi -e '$regex' $local_conf 2>&1
+                    echo "Used regex: $regex" `;
             push @confout, @tmp;
         }
         # Add the final build file to the display output

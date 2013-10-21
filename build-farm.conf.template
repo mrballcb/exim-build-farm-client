@@ -26,7 +26,8 @@ my $branch;
 # This template assumes that the user running the buildfarm process is "farm"
 %conf =(
     scm => 'git',
-    scmrepo => 'git://git.exim.org/exim.git', # default is community repo for either type
+    # default is github mirror of Exim
+    scmrepo => 'https://github.com/mrballcb/exim.git',
     # Wishlist for future, track and build from multiple repos.
     # Doesn't do anything yet.
     repos => {
@@ -130,7 +131,7 @@ my $branch;
     makefile_set =>{
         # comment out if not using ccache
         CC => 'ccache gcc',
-        # Other examples. Could use regex in config_features instead.
+        # Other examples. Could use makefile_regex instead.
         #SUPPORT_TLS => 'yes',
         #TLS_LIBS => '-lssl -lcrypto',
     },
@@ -147,8 +148,8 @@ my $branch;
 
     # Another way to enable things in the Local/Makefile.
     # Use a simple regex to change a default to what you want.
-    config_features=>[
-        q(s/^# EXPERIMENTAL_PRDR.*/EXPERIMENTAL_PRDR=yes/),
+    makefile_regex =>[
+        #q(s/^# EXPERIMENTAL_PRDR.*/EXPERIMENTAL_PRDR=yes/),
     ],
 
     # The user compiled as the master exim username.
