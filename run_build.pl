@@ -194,7 +194,6 @@ if (ref($force_every) eq 'HASH')
     $force_every = $force_every->{$branch} || $force_every->{default};
 }
 
-my $config_opts = $EximBuild::conf{config_opts};
 my $scm = new EximBuild::SCM \%EximBuild::conf;
 
 my $buildport;
@@ -1061,19 +1060,6 @@ sub configure
     return unless step_wanted('configure');
     print time_str(),"creating configuration ...\n" if $verbose;
 
-    my @quoted_opts;
-    foreach my $c_opt (@$config_opts)
-    {
-        if ($c_opt =~ /['"]/)
-        {
-            push(@quoted_opts,$c_opt);
-        }
-        else
-        {
-            push(@quoted_opts,"'$c_opt'");
-        }
-    }
-
     my $env = $EximBuild::conf{makefile_set};
     my $add = $EximBuild::conf{makefile_add};
     my $features = $EximBuild::conf{makefile_regex};
@@ -1146,6 +1132,13 @@ sub configure
                 echo "Contents of Local/Makefile:"
                 egrep '^[^#]' $local_conf `;
         push @confout, @tmp;
+        # Build the config_opts array to send to the server
+        my @config_opts = grep s/(?:LOOKUP_|EXPERIMENTAL_|USE_)(\S+)=.*/$1/,
+                          @tmp;
+        push @config_opts, grep s/^(?:EXIM_)(PERL|PYTHON)=.*/$1/,
+                           @tmp;
+        $EximBuild::conf{config_opts} = @config_opts;
+        
         # Does not matter what the Exim version is, as long as it is valid.
         my $exim_ver = $EximBuild::conf{exim_test_version} || '4.82';
         `cd $exim

@@ -174,7 +174,7 @@ my $branch;
     # locales to test
     locales => [qw( C )],
 
-    # Unused
+    # Placemarker for auto-generated build features
     config_opts =>[
         qw()
     ],
