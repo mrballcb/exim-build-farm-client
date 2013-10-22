@@ -1133,11 +1133,12 @@ sub configure
                 egrep '^[^#]' $local_conf `;
         push @confout, @tmp;
         # Build the config_opts array to send to the server
+        chomp @tmp;
         my @config_opts = grep s/(?:LOOKUP_|EXPERIMENTAL_|USE_)(\S+)=.*/$1/,
                           @tmp;
         push @config_opts, grep s/^(?:EXIM_)(PERL|PYTHON)=.*/$1/,
                            @tmp;
-        $EximBuild::conf{config_opts} = @config_opts;
+        $EximBuild::conf{config_opts} = \@config_opts;
         
         # Does not matter what the Exim version is, as long as it is valid.
         my $exim_ver = $EximBuild::conf{exim_test_version} || '4.82';
