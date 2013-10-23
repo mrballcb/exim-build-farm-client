@@ -1138,6 +1138,9 @@ sub configure
                           @tmp;
         push @config_opts, grep s/^(?:EXIM_)(PERL|PYTHON)=.*/$1/,
                            @tmp;
+        # OpenSSL doesn't have a specific USE flag
+        push @config_opts, grep s/^(TLS_LIBS.*-l(ssl|crypto)).*/OPENSSL/,
+                           @tmp;
         $EximBuild::conf{config_opts} = \@config_opts;
         
         # Does not matter what the Exim version is, as long as it is valid.
