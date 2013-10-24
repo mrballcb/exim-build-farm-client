@@ -999,6 +999,15 @@ sub make_test
                   ./runtest \$WORKDIR/$exim/src/build-*/exim -CONTINUE $tests_range )2>&1`;
       $status = $? >>8;
       push @makeout, @tmp;
+      # Prepend the failed summary log outputs for ease of reading
+      my $fail_summary = "$exim/test/failed-summary.log";
+      if (-f $fail_summary)
+      {
+        @tmp = `cat $fail_summary`;
+        push @tmp, "\n";
+        unshift @makeout, @tmp;
+        unshift @makeout, "Summary of failed tests:\n";
+      }
     }
     writelog('test',\@makeout);
     print "======== make test logs ===========\n",@makeout
