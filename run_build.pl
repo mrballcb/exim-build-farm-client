@@ -661,9 +661,9 @@ make();
 
 display_features();
 
-make_test() if (check_optional_step('make_test'));
+make_test() if (check_optional_step('test'));
 
-make_doc() if (check_optional_step('build_docs'));
+make_doc() if (check_optional_step('make-doc'));
 
 ##check_port_is_ok($buildport,'Post');
 
@@ -851,14 +851,14 @@ sub make
 
 sub make_doc
 {
-    return unless step_wanted('build_docs');
+    return unless step_wanted('make-doc');
     print time_str(),"running make doc ...\n" if $verbose;
 
     my (@makeout);
     @makeout = `cd $exim/doc/doc-docbook/ && \
                 EXIM_VER="4.82" $make everything 2>&1`;
     my $status = $? >>8;
-    writelog('build_docs',\@makeout);
+    writelog('make-doc',\@makeout);
     print "======== make doc log ===========\n",@makeout if ($verbose > 1);
     send_result('Doc',$status,\@makeout) if $status;
     $steps_completed .= " Doc";
@@ -996,7 +996,7 @@ sub make_isolation_check
 
 sub make_test
 {
-    return unless step_wanted('make_test');
+    return unless step_wanted('test');
     print time_str(),"running make test ...\n" if $verbose;
     my $tests_range = $EximBuild::conf{range_num_tests} || "1 4";
     my @makeout;
@@ -1020,7 +1020,7 @@ sub make_test
         unshift @makeout, "Summary of failed tests:\n";
       }
     }
-    writelog('make_test',\@makeout);
+    writelog('test',\@makeout);
     print "======== make test logs ===========\n",@makeout
       if ($verbose > 1);
 
