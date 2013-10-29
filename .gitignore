@@ -2,3 +2,11 @@ build-farm.conf
 build-farm_*.conf
 tags
 run_web_txn.pl
+test.pl
+test?.pl
+*~
+.*.swp
+*~
+#*#
+.#*#
+0*.patch

@@ -505,9 +505,11 @@ $steps_completed = "";
 
 my @changed_files;
 my @changed_since_success;
+my $last_config;
 my $last_status;
 my $last_run_snap;
 my $last_success_snap;
+my $current_config;
 my $current_snap;
 my @filtered_files;
 my $savescmlog = "";
@@ -553,10 +555,19 @@ elsif (!$from_source)
     unlink "last.success";
 
     # get the timestamp data
+    $last_config = find_last('config') || 0;
     $last_status = find_last('status') || 0;
     $last_run_snap = find_last('run.snap');
     $last_success_snap = find_last('success.snap');
     $forcerun = 1 unless (defined($last_run_snap));
+
+    # If config file changed, force a rebuild
+    ($current_config) = (stat $orig_dir.'/'.$buildconf)[9];
+    if ($current_config > $last_config)
+    {
+      $last_status = 0;
+      set_last('config',$current_config) unless $nostatus;
+    }
 
     # updated by find_changed to last mtime of any file in the repo
     $current_snap=0;
@@ -840,14 +851,14 @@ sub make
 
 sub make_doc
 {
-    return unless step_wanted('make-doc');
+    return unless step_wanted('build_docs');
     print time_str(),"running make doc ...\n" if $verbose;
 
     my (@makeout);
     @makeout = `cd $exim/doc/doc-docbook/ && \
                 EXIM_VER="4.82" $make everything 2>&1`;
     my $status = $? >>8;
-    writelog('make-doc',\@makeout);
+    writelog('build_docs',\@makeout);
     print "======== make doc log ===========\n",@makeout if ($verbose > 1);
     send_result('Doc',$status,\@makeout) if $status;
     $steps_completed .= " Doc";
@@ -985,7 +996,7 @@ sub make_isolation_check
 
 sub make_test
 {
-    return unless step_wanted('test');
+    return unless step_wanted('make_test');
     print time_str(),"running make test ...\n" if $verbose;
     my $tests_range = $EximBuild::conf{range_num_tests} || "1 4";
     my @makeout;
@@ -1009,7 +1020,7 @@ sub make_test
         unshift @makeout, "Summary of failed tests:\n";
       }
     }
-    writelog('test',\@makeout);
+    writelog('make_test',\@makeout);
     print "======== make test logs ===========\n",@makeout
       if ($verbose > 1);
 
