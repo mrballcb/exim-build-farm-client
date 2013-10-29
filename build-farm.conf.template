@@ -167,7 +167,7 @@ my $branch;
 
     optional_steps =>{
         # which optional steps to run and when to run them
-        # make-doc => {min_hours_since => 24*7},
+        # 'make-doc' => {min_hours_since => 24*7},
         test  => {min_hours_since => 24*7},
     },
 
