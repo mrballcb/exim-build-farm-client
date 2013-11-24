@@ -313,7 +313,8 @@ foreach my $oldfile (glob("last*"))
 
 my $branch_root = getcwd();
 
-# make sure we are using GNU make
+# Normally we would require GNU Make, but allow farm
+# configuration to override this
 die "$make is not GNU Make - please fix config file"
   unless check_make();
 
@@ -827,6 +828,12 @@ sub display_features
     
 sub check_make
 {
+    # Allow farm member to configure non-GNU make
+    my $non_gnu_make = $EximBuild::conf{non_gnu_make};
+    if (!defined $non_gnu_make ||
+        (defined $non_gnu_make && $non_gnu_make == 1)) {
+      return 'OK';
+    }
     my @out = `$make -v 2>&1`;
     return undef unless ($? == 0 && grep {/GNU Make/} @out);
     return 'OK';

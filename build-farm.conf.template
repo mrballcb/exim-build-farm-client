@@ -42,6 +42,8 @@ my $branch;
     # git_reference => undef,
     # or gmake if required. can include path if necessary.
     make => 'make',
+    # 1 = any make will do, 0 = require GNU (default)
+    non_gnu_make => 0,
     # >1 for parallel "make" and "make check" steps
     make_jobs => undef,
     # default is "tar -z -cf runlogs.tgz *.log"
