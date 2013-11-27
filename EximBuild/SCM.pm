@@ -202,6 +202,15 @@ sub checkout
 
     if (-d $target)
     {
+        # First check and see if git is in path
+        `which git 2>&1`;
+        if ($? != 0)
+        {
+            my @ret = `env`;
+            unshift @ret, "git not found in path\n";
+            main::send_result("$target-Git",$status,\@ret);
+        }
+        
         chdir $target;
         my @branches = `git branch 2>&1`;
         unless (grep {/^\* bf_$branch$/} @branches)
