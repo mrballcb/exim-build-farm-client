@@ -13,4 +13,8 @@ if which git >/dev/null; then
   git pull >/dev/null
 fi
 
+# Sanitize or set up environment
+# 1) Remove because spec.txt generation fails if set
+export -n PERL_UNICODE
+
 ./run_branches.pl $@
