@@ -767,9 +767,9 @@ sub check_optional_step
         &&grep {$_ eq $wday} @{$oconf->{dow}});
 
     my $last_step = $last_status = find_last("$step") || 0;
-
-    return undef unless ($forcerun ||
-                         time >$last_step + (3600 * $oconf->{min_hours_since}));
+    ## If made it *to* these optional steps, we just run them and reset last time
+    #return undef unless ($forcerun ||
+    #                     time >$last_step + (3600 * $oconf->{min_hours_since}));
     set_last("$step") unless $nostatus;
 
     return 1;
