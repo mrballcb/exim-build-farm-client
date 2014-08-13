@@ -28,14 +28,6 @@ my $branch;
     scm => 'git',
     # default is github mirror of Exim
     scmrepo => 'https://github.com/Exim/exim.git',
-    # Wishlist for future, track and build from multiple repos.
-    # Doesn't do anything yet.
-    repos => {
-      'exim' => 'git://www.mrball.net/exim/exim.git',
-      'exim.jgh' => 'git://www.mrball.net/exim/exim-jgh.git',
-      'exim.pdp' => 'git://www.mrball.net/exim/exim-pdp.git',
-      'exim.tlyons' => 'git://www.mrball.net/exim/exim-tlyons.git',
-    },
     # webref for diffs on server - use default for community
     scm_url => undef,
     # for --reference on git repo
@@ -168,7 +160,7 @@ my $branch;
         #q(s/^# LOOKUP_MYSQL=/LOOKUP_MYSQL=/),
         # If have postgres devel librarires installed
         #q(s/^# LOOKUP_PGSQL=/LOOKUP_PGSQL=/),
-
+        # Severl experimental features to consider
         #q(s/^# EXPERIMENTAL_CERTNAMES.*/EXPERIMENTAL_CERTNAMES=yes/),
         #q(s/^# EXPERIMENTAL_DNSSEC.*/EXPERIMENTAL_DNSSEC=yes/),
         # Proxy causes some extra debug output messing with tests
@@ -185,9 +177,9 @@ my $branch;
 
     # Range of tests to run if enable make_test in optional steps.
     #range_num_tests => '1 999',
-    range_num_tests => '1 999',
+    range_num_tests => '1 5999',
     # Hardcode some valid version for use during make test
-    exim_test_version => '4.80',
+    exim_test_version => '4.84',
 
     optional_steps =>{
         # which optional steps to run and when to run them
@@ -202,28 +194,6 @@ my $branch;
     config_opts =>[
         qw()
     ],
-
-    # per-branch contents of extra config for check stages.
-    # each branch has an array of setting lines (no \n required)
-    # a DEFAULT entry is used for all branches, before any
-    # branch-specific settings.
-    extra_config =>{
-        DEFAULT => [
-            #q(log_line_prefix = '[%c:%l] '),
-            #"log_connections = 'true'",
-            #"log_disconnections = 'true'",
-            #"log_statement = 'all'",
-            #"fsync = off"
-        ],
-    },
-
-    # Unused
-    # port number actually used will be based on this param and the branch,
-    # so we ensure they don't collide
-    base_port => 5678,
-
-    # Unused
-    modules => [qw(TestUpgrade)],
 
 );
 
