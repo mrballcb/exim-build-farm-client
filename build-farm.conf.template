@@ -133,9 +133,18 @@ my $branch;
     makefile_set =>{
         # comment out if not using ccache
         CC => 'ccache gcc',
+        # Required for some tests to pass
+        AUTH_PLAINTEXT => 'yes',
+        SUPPORT_MAILDIR => 'yes',
         # Other examples. Could use makefile_regex instead.
         #SUPPORT_TLS => 'yes',
+        #USE_OPENSSL_PC => 'openssl',
         #TLS_LIBS => '-lssl -lcrypto',
+        #EXPERIMENTAL_SPF => 'yes',
+        #LOOKUP_LDAP => 'yes',
+        #LOOKUP_INCLUDE => '-I/usr/include/mysql',
+        #LOOKUP_LIBS => '-lmysqlclient -lpq -lldap -llber',
+        #LDAP_LIB_TYPE => 'OPENLDAP2',
     },
     # Settings to add to Local/Makefile. These will add to variables that
     # are already defined earlier in the Makefile.  Example:
@@ -146,12 +155,25 @@ my $branch;
         # Or enable debugging flags
         #CFLAGS => '-g -Wall',
         #LFLAGS => '-g',
+        # If set EXPERIMENTAL_SPF above, add it to the linker:
+        #LDFLAGS => '-lspf2',
     },
 
     # Another way to enable things in the Local/Makefile.
     # Use a simple regex to change a default to what you want.
     makefile_regex =>[
-        #q(s/^# EXPERIMENTAL_PRDR.*/EXPERIMENTAL_PRDR=yes/),
+        # If have perl devel libraries installed, can build embedded perl
+        #q(s/^# EXIM_PERL=/EXIM_PERL=/),
+        # If have mysql devel libraries installed
+        #q(s/^# LOOKUP_MYSQL=/LOOKUP_MYSQL=/),
+        # If have postgres devel librarires installed
+        #q(s/^# LOOKUP_PGSQL=/LOOKUP_PGSQL=/),
+
+        #q(s/^# EXPERIMENTAL_CERTNAMES.*/EXPERIMENTAL_CERTNAMES=yes/),
+        #q(s/^# EXPERIMENTAL_DNSSEC.*/EXPERIMENTAL_DNSSEC=yes/),
+        # Proxy causes some extra debug output messing with tests
+        #q(s/^# EXPERIMENTAL_PROXY.*/EXPERIMENTAL_PROXY=yes/),
+        #q(s/^# EXPERIMENTAL_TPDA.*/EXPERIMENTAL_TPDA=yes/),
     ],
 
     # The user compiled as the master exim username.
