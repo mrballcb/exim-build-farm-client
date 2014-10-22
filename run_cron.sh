@@ -15,6 +15,10 @@ fi
 
 # Sanitize or set up environment
 # 1) Remove because spec.txt generation fails if set
-export -n PERL_UNICODE
+if env | grep -q '/bin/bash'; then
+  export -n PERL_UNICODE
+else
+  unset PERL_UNICODE
+fi
 
 ./run_branches.pl $@
