@@ -564,7 +564,7 @@ elsif (!$from_source)
 
     # If config file changed, force a rebuild
     ($current_config) = (stat $orig_dir.'/'.$buildconf)[9];
-    if ($current_config > $last_config)
+    if (defined $current_config && $current_config > $last_config)
     {
       $last_status = 0;
       set_last('config',$current_config) unless $nostatus;
