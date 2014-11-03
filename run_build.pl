@@ -562,8 +562,10 @@ elsif (!$from_source)
     $last_success_snap = find_last('success.snap');
     $forcerun = 1 unless (defined($last_run_snap));
 
-    # If config file changed, force a rebuild
-    ($current_config) = (stat $orig_dir.'/'.$buildconf)[9];
+    # If config file changed, force a rebuild.  This assumes that the config
+    # file is in the CWD, which may not always be true, so handle it by
+    # adding 1 to the value of last_config, which will force the rebuild.
+    ($current_config) = (stat $orig_dir.'/'.$buildconf)[9] || ($last_config+1);
     if ($current_config > $last_config)
     {
       $last_status = 0;
