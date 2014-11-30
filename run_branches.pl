@@ -41,6 +41,10 @@ die "only one of --run-all and --run-one permitted"
 die "need one of --run-all and --run-one"
   unless ($run_all || $run_one);
 
+# common mistake
+die "need group searchable homedir"
+  unless (stat($ENV{HOME}) & 0550 == 0550);
+
 # set up a "branch" variable for processing the config file
 use vars qw($branch);
 $branch = 'global';

@@ -42,6 +42,9 @@ my $branch;
     # replacement must have the same effect
     # must be absolute, can be either Unix or Windows style for MSVC
     tar_log_cmd => undef,
+    # If running multiple animals, an explicit common directory for
+    # the lockfile so that runs do not conflict. Otherwise, leave unset.
+    global_lock_dir => '/home/farm',
     # this directory must exist before anything will work
     build_root => '/home/farm/buildfarm',
     # set true to do vpath builds
