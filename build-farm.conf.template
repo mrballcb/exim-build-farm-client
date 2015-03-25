@@ -24,6 +24,8 @@ my $branch;
 }
 
 # This template assumes that the user running the buildfarm process is "farm"
+my $farm_user_name = 'farm';
+
 %conf =(
     scm => 'git',
     # default is github mirror of Exim
@@ -44,9 +46,9 @@ my $branch;
     tar_log_cmd => undef,
     # If running multiple animals, an explicit common directory for
     # the lockfile so that runs do not conflict. Otherwise, leave unset.
-    global_lock_dir => '/home/farm',
+    global_lock_dir => "/home/$farm_user_name",
     # this directory must exist before anything will work
-    build_root => '/home/farm/buildfarm',
+    build_root => "/home/$farm_user_name/buildfarm",
     # set true to do vpath builds
     use_vpath => undef,
 
@@ -111,7 +113,7 @@ my $branch;
     build_env =>{
         # use a dedicated cache for the build farm. this should give us
         # very high hit rates and slightly faster cache searching.
-        CCACHE_DIR => "/home/farm/buildfarm/ccache/$branch",
+        CCACHE_DIR => "/home/$farm_user_name/buildfarm/ccache/$branch",
 
         ### set this if you need a proxy setting for the
         # outbound web transaction that reports the results
