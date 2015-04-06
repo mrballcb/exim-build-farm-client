@@ -1140,7 +1140,10 @@ sub configure
         @tmp = `echo "Build Farm user info:"; id $me
           cd $exim && perl -pi -e 's/^# CONFIGURE_OWNER=\$/CONFIGURE_OWNER=$me/' $local_conf`;
         push @confout, @tmp;
-        @tmp = `cd $exim && perl -pi -e 's/^# TRUSTED_CONFIG_LIST=/TRUSTED_CONFIG_LIST=/' $local_conf`;
+        my $testdir = `cd $exim && /bin/pwd`; chomp $testdir; $testdir .= "/test";
+        my $trcf = "$testdir/trusted-configs";
+        my $tecf = "$testdir/test-config";
+        @tmp = `cd $exim && perl -pi -e "s%^# TRUSTED_CONFIG_LIST=.*%TRUSTED_CONFIG_LIST=$trcf%" $local_conf`;
         push @confout, @tmp;
         @tmp = `cd $exim && perl -pi -e 's/^# WHITELIST_D_MACROS=.*/WHITELIST_D_MACROS=DIR:EXIM_PATH:AA:ACL:ACLRCPT:ACL_MAIL:ACL_PREDATA:ACL_RCPT:AFFIX:ALLOW:ARG1:ARG2:AUTHF:AUTHS:AUTH_ID_DOMAIN:BAD:BANNER:BB:BR:BRB:CERT:COM:COMMAND_USER:CONNECTCOND:CONTROL:CREQCIP:CREQMAC:CRL:CSS:D6:DATA:DCF:DDF:DEFAULTDWC:DELAY:DETAILS:DRATELIMIT:DYNAMIC_OPTION:ELI:ERROR_DETAILS:ERT:FAKE:FALLBACK:FILTER:FILTER_PREPEND_HOME:FORBID:FORBID_SMTP_CODE:FUSER:HAI:HAP:HARDLIMIT:HEADER_LINE_MAXSIZE:HEADER_MAXSIZE:HELO_MSG:HL:HOSTS:HOSTS_AVOID_TLS:HOSTS_MAX_TRY:HVH:IFACE:IGNORE_QUOTA:INC:INSERT:IP1:IP2:LAST:LDAPSERVERS:LENCHECK:LIMIT:LIST:LOG_SELECTOR:LS:MAXNM:MESSAGE_LOGS:MSIZE:NOTDAEMON:ONCE:ONLY:OPT:OPTION:ORDER:PAH:PEX:PORT:PTBC:QDG:QOLL:QUOTA:QUOTA_FILECOUNT:QWM:RCPT_MSG:REMEMBER:REQUIRE:RETRY:RETRY1:RETRY2:RETURN:RETURN_ERROR_DETAILS:REWRITE:ROUTE_DATA:RRATELIMIT:RT:S:SELECTOR:SELF:SERVER:SERVERS:SREQCIP:SREQMAC:SRV:STD:STRICT:SUB:SUBMISSION_OPTIONS:TIMEOUTDEFER:TIMES:TRUSTED:TRYCLEAR:UL:USE_SENDER:UTF8:VALUE:WMF:X:Y/' $local_conf`;
         push @confout, @tmp;
@@ -1176,6 +1179,10 @@ sub configure
          echo 'EXIM_RELEASE_VERSION="$exim_ver"' > src/src/version.sh
          echo 'EXIM_VARIANT_VERSION=""' >> src/src/version.sh
          echo 'EXIM_COMPILE_NUMBER="0"' >> src/src/version.sh`;
+
+        # Create a trusted-configs list file
+        @tmp = `cd $exim && echo "$tecf" > "$trcf"`;
+        push @confout, @tmp;
     }
    
     print "======== configure output ===========\n",@confout
